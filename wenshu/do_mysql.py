@@ -144,6 +144,7 @@ if __name__ == "__main__":
                 # insert_content_data(json_object, type_value)
     close()
 
+
 # 插入数据示例
 # cursor.execute("INSERT INTO t_list (`44`, `1`) VALUES (%s, %s)", ("John Doe", "john@example.com"))
 

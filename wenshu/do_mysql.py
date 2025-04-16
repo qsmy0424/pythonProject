@@ -2,6 +2,7 @@ import mysql.connector
 import base64
 import json
 import zlib
+import logging
 from pathlib import Path
 
 from pymongo import MongoClient
@@ -37,7 +38,6 @@ def insert_list_data(entity, doc_type):
         crc32_value = zlib.crc32(combined)
         cursor.execute("SELECT id FROM t_list where crc = %s", (crc32_value,))
         if len(cursor.fetchall()) == 0:
-            mongo_db["doc_list"].insert_many(entity["queryResult"]["resultList"])
             data_tuple = (
                 doc_type,
                 item["44"],
@@ -57,6 +57,10 @@ def insert_list_data(entity, doc_type):
                 "INSERT INTO t_list(`type`, `44`, `1`, `2`, `26`, `7`, `rowkey`, `9`, `31`, `10`, `32`, `43`, `crc`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 data_tuple,
             )
+        else:
+            print("数据已存在")
+
+    db.commit()
 
 
 def insert_content_data(item, doc_type):
@@ -64,7 +68,7 @@ def insert_content_data(item, doc_type):
         fields = ["s1", "s2", "s7", "s22", "s23", "s26", "s27", "s28", "s31"]
         combined = "".join(str(item.get(field, "")) for field in fields).encode("utf-8")
         crc32_value = zlib.crc32(combined)
-
+        print(crc32_value)
         cursor.execute("SELECT id FROM t_content where crc = %s", (crc32_value,))
         exists_data = cursor.fetchall()
         if len(exists_data) == 0:
@@ -106,14 +110,14 @@ def insert_content_data(item, doc_type):
                 "INSERT INTO t_content(type, `s1`,`s2`,`s3`,`s5`,`s6`,`s7`,`s8`,`s9`,`s10`,`s31`,`s41`,`s43`,`s22`,`s23`,`s25`,`s26`,`s27`,`s28`,`s17`,`s45`,`s11`,`relWenshu`,`qwContent`,`directory`,`globalNet`,`s47`,`viewCount`,`wenshuAy`, `crc`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 data_tuple,
             )
+
+            db.commit()
         else:
             print("数据已存在")
 
 
 def close():
     # 提交更改到数据库
-    db.commit()
-
     # 关闭游标和数据库连接
     cursor.close()
     db.close()
@@ -142,8 +146,8 @@ if __name__ == "__main__":
                 # print(json_object)
                 insert_list_data(json_object, type_value)
                 # insert_content_data(json_object, type_value)
+    db.commit()
     close()
-
 
 # 插入数据示例
 # cursor.execute("INSERT INTO t_list (`44`, `1`) VALUES (%s, %s)", ("John Doe", "john@example.com"))

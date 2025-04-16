@@ -36,8 +36,8 @@ async def create_item(item_data: dict):
         if "doc" == item_data["type"]:
             do_mysql.insert_content_data(json_object, 3)
 
-        do_mysql.close()
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    print("Server started at http://0.0.0.0:8000")
+    do_mysql.close()

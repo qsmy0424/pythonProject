@@ -6,6 +6,7 @@ import sys
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from urllib.parse import quote_plus
 
 # 连接到 MySQL 数据库
 db = mysql.connector.connect(
@@ -52,6 +53,10 @@ def get_from_chrome():
             "https://wenshu.court.gov.cn/website/wenshu/181107ANFZ0BXSK4/index.html?docId="
             + row[1]
         )
+
+        # time.sleep(round(random.uniform(2, 5), 2))
+        # driver.get("https://wenshu.court.gov.cn/down/one?docId=" + quote_plus(row[1]))
+
         time.sleep(round(random.uniform(20, 40), 2))
         cursor.execute("UPDATE t_list SET status = 1 WHERE id = %s", (row[0],))
         db.commit()
